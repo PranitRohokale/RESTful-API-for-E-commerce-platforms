@@ -1,0 +1,66 @@
+const mongoose = require("mongoose");
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    maxlength: [40, "at most 40 charters in name"],
+    required: [true, "field name is missing"],
+  },
+  email: {
+    type: String,
+    validate: [validator.isEmail, "please enter email in correct format"],
+    required: [true, "field email is missing"],
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: [true, "password is missing"],
+    minlength: [6, "password should be at least 6 char"],
+  },
+  role: {
+    type: String,
+    default: "user",
+  },
+  photo: {
+    id: {
+      type: String,
+      required: true,
+    },
+    secure_url: {
+      type: String,
+      required: true,
+    },
+  },
+  forgotPasswordToken: String,
+  forgotPasswordExpiry: Date,
+  createdAt: {
+    type: Date,
+    default: Date.now, // not include () we dont want to run it now
+  },
+});
+
+//encrypt pass before save
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password") == false) {
+    return next();
+  }
+
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+// validate the password with passed password
+userSchema.methods.isValidatedPassword = async function (plainPassword) {
+  return await bcrypt.compare(plainPassword, this.password);
+};
+
+//method for create & return jwt token
+userSchema.methods.getJwtToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRY,
+  });
+};
+
+module.exports = mongoose.model("User", userSchema);
