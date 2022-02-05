@@ -1,6 +1,7 @@
 const app = require("./app");
 require("dotenv").config();
 require("colors").enable();
+require("./config/db").connectDb()
 
 const PORT = process.env.PORT || 4000;
 
