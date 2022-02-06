@@ -18,7 +18,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // for cookies & file middleware
 app.use(cookieParser());
-app.use(fileUpload());
+app.use(fileUpload({
+    useTempFiles:true,
+    tempFileDir:'/tmp/'
+}));
+
+//ejs 
+app.set("view engine", "ejs");
 
 //morgan middleware
 app.use(morgan(`tiny`));
@@ -29,5 +35,10 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //router middlewares
 app.use("/api/v1", homeRoute);
 app.use("/api/v1", userRoute);
+
+//testing route
+app.use("/signuptest",(req,res)=>{
+    res.render('signuptest')
+})
 
 module.exports = app;
