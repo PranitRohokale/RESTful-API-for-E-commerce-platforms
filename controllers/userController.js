@@ -4,7 +4,7 @@ const User = require("../models/user");
 const cookieToken = require("../utils/cookieToken");
 const cloudinary = require("cloudinary");
 const emailHelper = require("../utils/emailHelper");
-const crypto = require('crypto')
+const crypto = require("crypto");
 
 exports.signup = BigPromise(async (req, res, next) => {
   let photoResult;
@@ -149,12 +149,130 @@ exports.resetPassword = BigPromise(async (req, res, next) => {
     return next(new CustomeError("Token Expired or invalid", 400));
   }
 
-  user.password = password
-  user.forgotPasswordExpiry = undefined
-  user.forgotPasswordToken = undefined
-  
+  user.password = password;
+  user.forgotPasswordExpiry = undefined;
+  user.forgotPasswordToken = undefined;
+
   await user.save();
 
-  cookieToken(res,user)
+  cookieToken(res, user);
 });
 
+exports.getLoggedInUserDetails = (req, res) => {
+  const user = req.user;
+  res.status(200).json({
+    success: true,
+    user,
+  });
+};
+
+exports.changePassword = BigPromise(async (req, res, next) => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = req.user._id;
+  console.log(userId);
+  const user = await User.findById(userId).select("+password");
+
+  const isOldPasswordCorrect = await user.isValidatedPassword(oldPassword);
+
+  if (!isOldPasswordCorrect) {
+    return next(new CustomeError("Old password is incorrect", 400));
+  }
+
+  user.password = newPassword;
+  await user.save();
+  res.status(200).json({
+    success: true,
+    message: "Password changed!",
+  });
+});
+
+exports.updateUserDetails = BigPromise(async (req, res, next) => {
+  const { name, email } = req.body;
+
+  if (!(name && email)) {
+    return next(new CustomeError("name & email field required!", 400));
+  }
+
+  let newData = {
+    name,
+    email,
+  };
+
+  //checking new photo
+  if (req.files) {
+    const photo = req.files.photo;
+    const photoId = req.user.photo.id;
+
+    // delete photo from cloudinary
+    await cloudinary.v2.uploader.destroy(photoId);
+
+    //inserting new photo
+    const newPhoto = await cloudinary.v2.uploader.upload(photo.tempFilePath, {
+      folder: "users",
+      width: 150,
+      crop: "scale",
+    });
+
+    newData.photo = {
+      id: newPhoto.public_id,
+      secure_url: newPhoto.secure_url,
+    };
+  }
+
+  const newUser = await User.findByIdAndUpdate(req.user.id, newData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    user: newUser,
+  });
+});
+
+exports.getAllUsers = BigPromise(async (req, res, next) => {
+  const users = await User.find();
+
+  res.status(200).json({
+    success: true,
+    users,
+  });
+});
+
+exports.admingetOneUser = BigPromise(async (req, res, next) => {
+  const user = await User.findById(req.params.userId);
+  if (!user) return next(new CustomeError("nUser is not exists!", 400));
+
+  res.status(200).json({ success: true, user });
+});
+
+exports.getOneUser = BigPromise(async (req, res, next) => {
+  const user = await User.findById(req.params.userId);
+  if (!user) return next(new CustomeError("nUser is not exists!", 400));
+
+  res.status(200).json({ success: true, user });
+});
+
+exports.deleteOneUser = BigPromise(async (req, res, next) => {
+  const user = await User.findById(req.params.userId);
+  if (!user) return next(new CustomeError("User is not exists!", 400));
+
+  if (user.photo) {
+    await cloudinary.v2.uploader.destroy(user.photo.id);
+  }
+  await user.remove();
+
+  res.status(200).json({ success: true });
+});
+
+exports.updateUserRole = BigPromise(async (req, res, next) => {
+  const user = await User.findById(req.params.userId);
+  if (!user) return next(new CustomeError("User is not exists!", 400));
+
+  const newRole = req.body.role;
+  user.role = newRole;
+  await user.save();
+
+  res.status(200).json({ success: true, user });
+});
