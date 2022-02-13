@@ -10,6 +10,7 @@ const swaggerDocument = YAML.load("./swagger.yaml");
 // import routers
 const homeRoute = require("./routers/home");
 const userRoute = require("./routers/user");
+const productRoute = require("./routers/product");
 
 const app = express();
 //normal middleware
@@ -35,6 +36,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //router middlewares
 app.use("/api/v1", homeRoute);
 app.use("/api/v1", userRoute);
+app.use("/api/v1", productRoute);
 
 //testing route
 app.use("/signuptest",(req,res)=>{

@@ -106,6 +106,7 @@ exports.forgotPassword = BigPromise(async (req, res, next) => {
     const url = `${req.protocol}://${req.get(
       "host"
     )}/api/v1/password/reset/${forgotToken}`;
+    
     const message = `visit this url to forgot your password \t ${url}`;
 
     emailHelper({
