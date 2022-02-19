@@ -32,5 +32,25 @@ class WhereClause {
     this.base = this.base.limit(resultPerPage).skip(skipVal);
     return this;
   }
-  
+
+  filter() {
+    const copyQ = { ...this.bigQ };
+
+    delete copyQ["search"];
+    delete copyQ["page"];
+    delete copyQ["category"];
+    delete copyQ["limit"];
+
+    let filterString = JSON.stringify(copyQ);
+
+    filterString = filterString.replace(/\b(gte|lte|gt|lt)\b/g, (m) => `$${m}`);
+
+    //creating obj
+    filterString = JSON.parse(filterString)
+    
+    this.base = this.base.find(filterString)
+    return this
+  }
 }
+
+module.exports = WhereClause
