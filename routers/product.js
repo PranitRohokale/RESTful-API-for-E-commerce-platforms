@@ -9,16 +9,22 @@ const {
   getOneProduct,
   updateProduct,
   deleteProduct,
+  addReview,
+  getAllReviewsOfOneProduct,
+  deleteReview,
 } = require("../controllers/productController");
 //middlewares
 const { isLoggedIn, customRole } = require("../middlewares/user");
 
 //GET
 router.route("/testProduct").get(testProduct);
+router.route("/getProducts").get( getAllProducts);
+router.route("/product/:id").get( getOneProduct);
+router.route("/product/review/all").get(getAllReviewsOfOneProduct); // productId expect in query
 
 // USER
-router.route("/getProducts").get(isLoggedIn, getAllProducts);
-router.route("/product/:id").get(isLoggedIn, getOneProduct);
+router.route("/product/:id/review").put(isLoggedIn, addReview);
+router.route("/product/:id/review").delete(isLoggedIn, deleteReview);
 
 // ADMIN
 router
