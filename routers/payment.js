@@ -8,7 +8,7 @@ const {
 
 const { isLoggedIn } = require("../middlewares/user");
 
-router.route("/stripekey").get(isLoggedIn, sendRazorpayKey);
+router.route("/razorpaykey").get(isLoggedIn, sendRazorpayKey);
 router.route("/capturerazorpay").post(isLoggedIn, captureRazorpayPayment);
 
 module.exports = router;

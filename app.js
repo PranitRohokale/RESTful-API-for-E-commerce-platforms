@@ -12,6 +12,7 @@ const homeRoute = require("./routers/home");
 const userRoute = require("./routers/user");
 const productRoute = require("./routers/product");
 const paymentRoute = require("./routers/payment");
+const orderRoute = require("./routers/order");
 
 const app = express();
 //normal middleware
@@ -39,6 +40,7 @@ app.use("/api/v1", homeRoute);
 app.use("/api/v1", userRoute);
 app.use("/api/v1", productRoute);
 app.use("/api/v1", paymentRoute);
+app.use("/api/v1", orderRoute);
 
 //testing route
 app.use("/signuptest",(req,res)=>{
