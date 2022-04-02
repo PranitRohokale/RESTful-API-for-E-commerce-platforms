@@ -2,6 +2,7 @@ const app = require("./app");
 require("dotenv").config();
 require("colors").enable();
 require("./config/db").connectDb();
+
 const cloudinary = require("cloudinary");
 const PORT = process.env.PORT || 4000;
 
@@ -11,6 +12,7 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
 
 app.get("/", (req, res) => {
   res.status(200).send("Welcome Dude!");

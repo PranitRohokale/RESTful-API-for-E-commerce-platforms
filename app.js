@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const morgan = require("morgan");
+const cors=require("cors");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const swaggerUi = require("swagger-ui-express");
@@ -31,6 +32,15 @@ app.set("view engine", "ejs");
 
 //morgan middleware
 app.use(morgan(`tiny`));
+
+//CORS
+const corsOptions ={
+  origin:'*', 
+  credentials:true,            //access-control-allow-credentials:true
+  optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions)) 
 
 // swagger doc
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

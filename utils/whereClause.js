@@ -46,11 +46,11 @@ class WhereClause {
     filterString = filterString.replace(/\b(gte|lte|gt|lt)\b/g, (m) => `$${m}`);
 
     //creating obj
-    filterString = JSON.parse(filterString)
-    
-    this.base = this.base.find(filterString)
-    return this
+    filterString = JSON.parse(filterString);
+
+    this.base = this.base.find(filterString);
+    return this;
   }
 }
 
-module.exports = WhereClause
+module.exports = WhereClause;
