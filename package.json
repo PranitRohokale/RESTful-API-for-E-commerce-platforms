@@ -1,5 +1,5 @@
 {
-  "name": "tshirtstore",
+  "name": "restful-api-ecomerse-platform",
   "version": "1.0.0",
   "description": "a backed api server for an ecomm app",
   "main": "index.js",
